@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Relés</title>
+    <style>
+        /* Adicione estilos de botão de acordo com a sua preferência */
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .button-container button {
+            width: 150px;
+            height: 60px;
+            margin: 10px;
+            font-size: 16px;
+        }
+
+        .ligado {
+            background-color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>Status dos Relés</h1>
+    <div>
+        <label for="temp">Temperatura: <span id="tempLabel">-</span>°C</label>
+    </div>
+    <div>
+        <label for="umid">Umidade: <span id="umidLabel">-</span>%</label>
+    </div>
+    <div class="button-container">
+        <button>Rele 1</button>
+        <button>Rele 2</button>
+        <button>Rele 3</button>
+        <button>Rele 4</button>
+        <button>Rele 5</button>
+        <button id="ligarTodos">Ligar Todos</button>
+        <button id="desligarTodos">Desligar Todos</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const buttons = document.querySelectorAll("button");
+            const tempLabel = document.getElementById("tempLabel");
+            const umidLabel = document.getElementById("umidLabel");
+
+            // Função para enviar JSON para o servidor WebSocket
+            function enviarJSON(id, group, user, data) {
+                const jsonData = {
+                    id: id,
+                    group: group,
+                    user: user,
+                    data: data
+                };
+
+                const ws = new WebSocket("wss://websocket-reles.up.railway.app");
+
+                ws.addEventListener("open", () => {
+                    ws.send(JSON.stringify(jsonData));
+                });
+
+                ws.addEventListener("close", () => {
+                    console.log("Conexão WebSocket fechada.");
+                });
+
+                ws.addEventListener("error", (error) => {
+                    console.error("Erro WebSocket:", error);
+                });
+
+                // Lidar com mensagens recebidas do servidor
+                ws.addEventListener("message", (event) => {
+                    try {
+                        const receivedData = JSON.parse(event.data);
+                        // Atualizar o estado dos botões com base nos dados recebidos
+                        for (let i = 0; i < buttons.length; i++) {
+                            const button = buttons[i];
+                            const releStatus = receivedData.data[`rele${i + 1}`];
+                            if (releStatus === 1) {
+                                button.classList.add("ligado");
+                            } else {
+                                button.classList.remove("ligado");
+                            }
+                        }
+                        // Atualizar as labels de temperatura e umidade
+                        tempLabel.textContent = receivedData.data.temp;
+                        umidLabel.textContent = receivedData.data.umid;
+                    } catch (error) {
+                        console.error("Erro ao processar mensagem recebida:", error);
+                    }
+                });
+            }
+
+            // Enviar "sts" na inicialização da página
+            enviarJSON("paginaHTML", "teste", "slave", "sts");
+
+            // Adicione eventos de clique aos botões
+            buttons.forEach((button, index) => {
+                button.addEventListener("click", () => {
+                    // Alternar o estado do botão (ligado/desligado)
+                    const buttonState = !button.classList.contains("ligado");
+
+                    // Criar objeto JSON com base no estado do botão pressionado
+                    const id = "paginaHTML";
+                    const group = "teste";
+                    const user = "slave";
+                    const data = {
+                        [`rele${index + 1}`]: buttonState ? 1 : 0
+                    };
+
+                    enviarJSON(id, group, user, data);
+                });
+            });
+
+            // Adicione evento para ligar todos os relés
+            const ligarTodos = document.getElementById("ligarTodos");
+            ligarTodos.addEventListener("click", () => {
+                const id = "paginaHTML";
+                const group = "teste";
+                const user = "slave";
+                const data = {
+                    rele1: 1,
+                    rele2: 1,
+                    rele3: 1,
+                    rele4: 1,
+                    rele5: 1
+                };
+                enviarJSON(id, group, user, data);
+            });
+
+            // Adicione evento para desligar todos os relés
+            const desligarTodos = document.getElementById("desligarTodos");
+            desligarTodos.addEventListener("click", () => {
+                const id = "paginaHTML";
+                const group = "teste";
+                const user = "slave";
+                const data = {
+                    rele1: 0,
+                    rele2: 0,
+                    rele3: 0,
+                    rele4: 0,
+                    rele5: 0
+                };
+                enviarJSON(id, group, user, data);
+            });
+        });
+    </script>
+</body>
+</html>

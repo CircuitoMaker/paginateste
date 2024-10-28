@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Video Chat</title>
+    <style>
+        #localVideo, #remoteVideo {
+            width: 45vw;
+            height: 45vh;
+            object-fit: cover;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            background-color: #000;
+        }
+
+        body {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 100vh;
+            background-color: #333;
+            margin: 0;
+            overflow: hidden;
+        }
+        #permissionNotice {
+            color: #fff;
+            font-size: 1.2em;
+            text-align: center;
+            padding: 1em;
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <video id="localVideo" autoplay playsinline muted></video>
+    <video id="remoteVideo" autoplay playsinline></video>
+    <div id="permissionNotice">Permita o uso da câmera e do microfone para continuar.</div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -74,5 +74,4 @@ function iniciarPeerConnection(targetId) {
 // Solicita permissões ao carregar a página
 window.onload = () => {
     solicitarPermissoes();
-    
 };

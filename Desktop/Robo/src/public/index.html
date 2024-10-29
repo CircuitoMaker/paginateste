@@ -23,6 +23,7 @@
             margin: 0;
             overflow: hidden;
         }
+
         #permissionNotice {
             color: #fff;
             font-size: 1.2em;
@@ -38,8 +39,9 @@
     <video id="localVideo" autoplay playsinline muted></video>
     <video id="remoteVideo" autoplay playsinline></video>
     <div id="permissionNotice">Permita o uso da câmera e do microfone para continuar.</div>
+    
     <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script>
+    <script src="socket.js"></script> <!-- Adicione esta linha -->
 </body>
-
 </html>
